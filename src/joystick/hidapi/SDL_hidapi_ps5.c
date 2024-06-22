@@ -414,7 +414,13 @@ static SDL_bool HIDAPI_DriverPS5_InitDevice(SDL_HIDAPI_Device *device)
         /* Connected over Bluetooth, using enhanced reports */
         ctx->enhanced_reports = SDL_TRUE;
     } else {
-        /* Connected over Bluetooth, using simple reports (DirectInput enabled) */
+        /* Connected over Bluetooth, using simple reports (DirectInput enabled)
+           Requesting the calibration feature report enables enhanced reports
+           over bluetooth on the gamepad.
+        */
+        if (ReadFeatureReport(device->dev, k_EPS5FeatureReportIdCalibration, data, USB_PACKET_LENGTH) > 0) {
+            ctx->enhanced_reports = SDL_TRUE;
+        }
     }
 
     if (device->vendor_id == USB_VENDOR_SONY && ctx->enhanced_reports) {
